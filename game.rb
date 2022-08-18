@@ -30,12 +30,35 @@ class Game
     select_word if @word.length < 5 || @word.length > 12
   end
 
-  def play
-    return unless @remaining_guesses.positive?
+  def input_prompt
+    puts 'Enter a letter to guess the secret word:'
+    input = gets.chomp
 
+    if input.length == 1 && input.match?(/[a-zA-Z]/)
+      check_input(input.downcase)
+    else
+      puts 'Invalid input.'
+      input_prompt
+    end
+  end
+
+  def check_input(input)
+    @remaining_guesses -= 1
+    if @word.match?(input)
+      puts "Match found!\n\n"
+    else
+      puts "The secret word does not contain '#{input}'.\n\n"
+    end
+  end
+
+  def play
     # Following line to be removed
     puts @word
-    puts Display.new(@remaining_guesses, @guess)
+
+    while @remaining_guesses.positive?
+      puts Display.new(@remaining_guesses, @guess)
+      input_prompt
+    end
   end
 end
 
