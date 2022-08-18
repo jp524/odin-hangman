@@ -1,15 +1,37 @@
+# frozen_string_literal: false
+
 require 'csv'
 
+# Starts game and contains the game's logic
 class Game
   def initialize
     @dictionary = []
     @word = ''
-    @remaining_guesses = 8
+    @remaining_guesses = 12
     @guess = ''
     load_dictionary
     select_word
     guess_template
   end
+
+  def play
+    # Following line to be removed
+    puts @word
+
+    while @remaining_guesses.positive?
+      if @guess == @word
+        puts "#{@word}\nYou won!"
+        break
+      end
+
+      puts Display.new(@remaining_guesses, @guess)
+      input_prompt
+    end
+
+    puts "Better luck next time! The secret word was '#{@word}'." if @remaining_guesses.zero?
+  end
+
+  private
 
   def load_dictionary
     contents = CSV.open('google-10000-english-no-swears.txt')
@@ -46,22 +68,24 @@ class Game
     @remaining_guesses -= 1
     if @word.match?(input)
       puts "Match found!\n\n"
+      update_guess(input)
     else
       puts "The secret word does not contain '#{input}'.\n\n"
     end
   end
 
-  def play
-    # Following line to be removed
-    puts @word
-
-    while @remaining_guesses.positive?
-      puts Display.new(@remaining_guesses, @guess)
-      input_prompt
+  def update_guess(letter)
+    indexes = []
+    @word.length.times do |i|
+      indexes << i if @word[i] == letter
+    end
+    indexes.each_entry do |i|
+      @guess[i] = letter
     end
   end
 end
 
+# Displays current state of guess and the number of guesses remaining
 class Display
   def initialize(remaining_guesses, guess)
     @remaining_guesses = remaining_guesses
