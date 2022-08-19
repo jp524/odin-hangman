@@ -17,8 +17,7 @@ class Game
   end
 
   def play
-    # Following line to be removed
-    puts @word
+    load_save_prompt
 
     while @remaining_guesses.positive? && @save_game == false
       if @guess == @word
@@ -109,6 +108,21 @@ class Game
     File.open(filename, 'w') do |file|
       file.puts game_data
     end
+  end
+
+  def load_save_prompt
+    puts "Would you like to open a saved game? Type Y for yes, or any other key for no.\n"
+    input = gets.chomp.downcase
+
+    load_save if input == 'y'
+  end
+
+  def load_save
+    game_data = YAML.load_file('save.yaml')
+    @word = game_data[:word]
+    @guess = game_data[:guess]
+    @remaining_guesses = game_data[:remaining_guesses]
+    puts "\nSaved gamed loaded!"
   end
 end
 
