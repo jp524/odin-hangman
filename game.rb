@@ -1,6 +1,7 @@
 # frozen_string_literal: false
 
 require 'csv'
+require 'yaml'
 
 # Starts game and contains the game's logic
 class Game
@@ -9,6 +10,7 @@ class Game
     @word = ''
     @remaining_guesses = 12
     @guess = ''
+    @save_game = false
     load_dictionary
     select_word
     guess_template
@@ -18,14 +20,14 @@ class Game
     # Following line to be removed
     puts @word
 
-    while @remaining_guesses.positive?
+    while @remaining_guesses.positive? && @save_game == false
       if @guess == @word
         puts "#{@word}\nYou won!"
         break
       end
 
       puts Display.new(@remaining_guesses, @guess)
-      input_prompt
+      save_prompt
     end
 
     puts "Better luck next time! The secret word was '#{@word}'." if @remaining_guesses.zero?
@@ -82,6 +84,24 @@ class Game
     indexes.each_entry do |i|
       @guess[i] = letter
     end
+  end
+
+  def save_prompt
+    puts "\nWould you like to save the game? Type Y for yes, or any other key for no.\n"
+    input = gets.chomp.downcase
+
+    if input == 'y'
+      save_game
+    else
+      input_prompt
+    end
+  end
+
+  def save_game
+    @save_game = true
+    object = [@word, @guess, @remaining_guesses]
+    game_data = YAML.dump(object)
+    puts "game data: #{game_data}"
   end
 end
 
