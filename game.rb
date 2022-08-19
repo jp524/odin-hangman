@@ -99,9 +99,16 @@ class Game
 
   def save_game
     @save_game = true
-    object = [@word, @guess, @remaining_guesses]
-    game_data = YAML.dump(object)
-    puts "game data: #{game_data}"
+    game_data = YAML.dump({
+                            word: @word,
+                            guess: @guess,
+                            remaining_guesses: @remaining_guesses
+                          })
+
+    filename = 'save.yaml'
+    File.open(filename, 'w') do |file|
+      file.puts game_data
+    end
   end
 end
 
